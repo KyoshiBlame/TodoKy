@@ -22,3 +22,15 @@ env-clean-up:
 	else \
 		echo "Очистка окружения отменена"; \
 	fi
+
+migrate-create:
+	@if [ -z "$(seq)" ]; then \
+		echo "Отсутствует параметр seq. Пример команды: make migrate-create seq=example"; \
+		exit 1; \
+	fi
+	@docker compose run --rm todoky-postgres-migrate \
+		create -ext sql -dir /migrations -seq "$(seq)"
+
+
+test-target:
+	@echo "value: $(var)" 
