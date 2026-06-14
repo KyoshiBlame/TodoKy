@@ -31,6 +31,23 @@ migrate-create:
 	@docker compose run --rm todoky-postgres-migrate \
 		create -ext sql -dir /migrations -seq "$(seq)"
 
+migrate-up:
+	make migrate-action action=up
+
+migrate-down:
+	make migrate-action action=down
+
+migrate-action:
+
+	@if [ -z "$(action)"]; then \
+		echo "Отсутствует параметр action.; \
+		exit 1; \
+	fi
+
+	docker compose run --rm todoky-postgres-migrate \
+		-path /migrations \
+		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoky-postgres:5432/${POSTGRES_DB}?sslmode=disable \
+		"$(action)"
 
 test-target:
 	@echo "value: $(var)" 
