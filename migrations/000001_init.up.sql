@@ -25,7 +25,7 @@ CREATE TABLE todoky.tasks (
         (completed=FALSE AND completed_at IS NULL)
         OR
         (completed=TRUE AND completed_at IS NOT NULL AND completed_at >= created_at)
-    )
+    ),
 
     author_user_id INTEGER NOT NULL REFERENCES todoky.users(id)
 );

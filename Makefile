@@ -7,10 +7,10 @@ export PROJECT_ROOT
 .PHONY: env-up env-down env-clean-up
 
 env-up:
-	docker compose up -d todoky-postgres
+	@docker compose up -d todoky-postgres
 
 env-down:
-	docker compose down
+	@docker compose down
 
 env-clean-up:
 	@printf "Очистить все файлы окружения? Возможна потеря данных. [y/N]: "; \
