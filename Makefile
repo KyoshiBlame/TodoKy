@@ -23,6 +23,13 @@ env-clean-up:
 		echo "Очистка окружения отменена"; \
 	fi
 
+env-port-forward:
+	@docker compose up -d port-forwarder
+
+env-port-close:
+	@docker compose down port-forwarder
+
+
 migrate-create:
 	@if [ -z "$(seq)" ]; then \
 		echo "Отсутствует параметр seq. Пример команды: make migrate-create seq=example"; \
