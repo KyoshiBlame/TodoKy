@@ -21,9 +21,3 @@ services:
     command: -d -d TCP-LISTEN:5432,fork,reuseaddr TCP-CONNECT:todoky-postgres:5432
     ports:
       - "127.0.0.1:5432:5432"
-  # port-forwarder:
-  #   image: alpine/socat:1.8.0.3
-  #   container_name: todoky-postgres-port-forwarder
-  #   command: tcp-listen:5432,fork,reuseaddr tcp-connect:todoky-postgres:5432
-  #   ports:
-  #     - "127.0.0.1:5432:5432"
