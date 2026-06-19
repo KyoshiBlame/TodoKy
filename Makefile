@@ -55,5 +55,5 @@ migrate-action:
 		-database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoky-postgres:5432/${POSTGRES_DB}?sslmode=disable" \
 		"$(action)"
 
-test-target:
-	@echo "value: $(var)"
+todoky-run:
+	@go run ./cmd/todoky
