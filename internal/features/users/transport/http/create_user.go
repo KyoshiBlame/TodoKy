@@ -1,0 +1,17 @@
+package users_transport_http
+
+type CreateUsersRequest struct {
+	FullName 	string 	`json:"full_name"`
+	PhoneNumber *string	`json:"phone_number"`
+}
+
+type CreateUserResponse struct {
+	ID 			int 	`json:"id"`
+	Version 	int		`json:"version"`
+	FullName 	string	`json:"full_name"`
+	PhoneNumber *string `json:"phone_number"`
+}
+
+func (h *UsersHTTPHandler) CreateUserRequest() {
+	
+}
