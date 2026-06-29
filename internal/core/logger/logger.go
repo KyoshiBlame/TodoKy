@@ -61,3 +61,10 @@ func (l *Logger) Close() {
 		fmt.Println("Failed to close application to logger: ", err)
 	}
 }
+
+func (l *Logger) With(field ...zap.Field) *Logger {
+	return &Logger{
+		Logger: l.Logger.With(field...),
+		file: l.file,
+	}
+}

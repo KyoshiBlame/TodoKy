@@ -14,4 +14,4 @@ func NewUsersHTTPHandler(
 	return &UsersHTTPHandler{
 		UsersService: UserService,
 	}
-}
+}	
