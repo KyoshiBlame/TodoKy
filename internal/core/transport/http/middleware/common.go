@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
+	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/resposnse"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -29,6 +30,7 @@ func RequestID() Middleware {
 	}
 }
 
+//logger
 func Logger(log *core_logger.Logger) Middleware {
 	return func (next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
@@ -42,6 +44,27 @@ func Logger(log *core_logger.Logger) Middleware {
 			ctx := context.WithValue(r.Context(), "log", l)//по ключу log передаём наш логгер
 
 			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+//ловец паники
+func Panic() Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+			ctx := r.Context()
+			log := core_logger.FromContext(ctx)
+			responseHandler := core_http_response.NewHTTPResponseHandler(log, w)
+			defer func () {
+				if p := recover(); p != nil {
+					responseHandler.PanicResponse(
+						p, 
+						"during, handle HTTP request got unexpected panic",
+					)
+				}
+			}()
+
+			next.ServeHTTP(w,r)
 		})
 	}
 }

@@ -1,5 +1,11 @@
 package users_transport_http
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
 type CreateUsersRequest struct {
 	FullName 	string 	`json:"full_name"`
 	PhoneNumber *string	`json:"phone_number"`
@@ -12,6 +18,9 @@ type CreateUserResponse struct {
 	PhoneNumber *string `json:"phone_number"`
 }
 
-func (h *UsersHTTPHandler) CreateUserRequest() {
-	
+func (h *UsersHTTPHandler) CreateUserRequest(w http.ResponseWriter, r *http.Request) {
+	var request CreateUsersRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		fmt.Println("произошла ашибка")
+	}
 }
