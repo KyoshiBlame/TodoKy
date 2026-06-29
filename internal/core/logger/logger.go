@@ -17,6 +17,7 @@ type Logger struct {
 	file *os.File //для корректного закрытия файла
 }
 
+// получаем логгер через контекст
 func FromContext(ctx context.Context) *Logger {
 	log, ok := ctx.Value("log").(*Logger)
 

@@ -18,6 +18,7 @@ func NewResponseWriter(w http.ResponseWriter) *ResponseWriter{
 	}
 }
 
+//записываем передаваемый статус код через WriteHeader и запоминаем его
 func (rw *ResponseWriter) WriteHeader(statusCode int) {
 	rw.ResponseWriter.WriteHeader(statusCode)
 	rw.statusCode = StatusCodeUninitialized
