@@ -56,4 +56,5 @@ migrate-action:
 		"$(action)"
 
 todoky-run:
-	@go run ./cmd/todoky
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	go run ./cmd/todoky
