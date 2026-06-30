@@ -18,7 +18,7 @@ type CreateUserResponse struct {
 	PhoneNumber *string `json:"phone_number"`
 }
 
-func (h *UsersHTTPHandler) CreateUserRequest(w http.ResponseWriter, r *http.Request) {
+func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var request CreateUsersRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		fmt.Println("произошла ашибка")

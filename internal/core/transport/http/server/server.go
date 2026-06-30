@@ -15,13 +15,13 @@ type HTTPServer struct {
 	//мультиплексер по входящему http запросу распознает через какие middleware тому следует пройти и в какой обрботчик его нужно направить
 	mux *http.ServeMux
 	config Config
-	log core_logger.Logger
+	log *core_logger.Logger
 }
 
 
 func NewHTTPServer(
 	config Config,
-	log core_logger.Logger,
+	log *core_logger.Logger,
 ) *HTTPServer {
 	return &HTTPServer{
 		mux: http.NewServeMux(),
@@ -79,4 +79,17 @@ func (h *HTTPServer) Run(ctx context.Context) error {
 
 	return nil
 
+}
+
+func (h *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) {
+	for _, router := range routers {
+		prefix := "api/" + string(router.apiVersion)
+		
+
+		h.mux.Handle(
+			//убираем префик, потому что фичи о нём знать не обязательно
+			prefix+"/",
+			http.StripPrefix(prefix, router),
+		)
+	}
 }
