@@ -11,16 +11,14 @@ import (
 	"go.uber.org/zap"
 )
 
-
 type HTTPServer struct {
 	//мультиплексер по входящему http запросу распознает через какие middleware тому следует пройти и в какой обрботчик его нужно направить
-	mux *http.ServeMux
+	mux    *http.ServeMux
 	config Config
-	log *core_logger.Logger
+	log    *core_logger.Logger
 
 	middleware []core_http_middleware.Middleware
 }
-
 
 func NewHTTPServer(
 	config Config,
@@ -28,9 +26,9 @@ func NewHTTPServer(
 	middleware ...core_http_middleware.Middleware,
 ) *HTTPServer {
 	return &HTTPServer{
-		mux: http.NewServeMux(),
-		config: config,
-		log: log,
+		mux:        http.NewServeMux(),
+		config:     config,
+		log:        log,
 		middleware: middleware,
 	}
 }
@@ -38,17 +36,16 @@ func NewHTTPServer(
 func (h *HTTPServer) Run(ctx context.Context) error {
 
 	mux := core_http_middleware.ChainMiddleware(h.mux, h.middleware...)
-	server := &http.Server {
-		Addr: h.config.Addr,
+	server := &http.Server{
+		Addr:    h.config.Addr,
 		Handler: mux,
-
 	}
 
 	ch := make(chan error, 1)
 
 	//запуск через горутину чтобы создать GraceFullShutDown через context
-	go func () {
-		
+	go func() {
+
 		defer close(ch)
 
 		h.log.Warn("Start HTTP server", zap.String("addr", h.config.Addr))
@@ -58,14 +55,14 @@ func (h *HTTPServer) Run(ctx context.Context) error {
 		if !errors.Is(err, http.ErrServerClosed) {
 			ch <- err
 		}
-	} ()
+	}()
 
 	select {
 	case err := <-ch:
 		if err != nil {
 			return fmt.Errorf("listen and serve HTTP error: %w", err)
 		}
-	case <-ctx.Done() :
+	case <-ctx.Done():
 		h.log.Warn("ShutDown HTTP server...")
 
 		shutdownCtx, cancel := context.WithTimeout(
@@ -90,8 +87,7 @@ func (h *HTTPServer) Run(ctx context.Context) error {
 
 func (h *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) {
 	for _, router := range routers {
-		prefix := "api/" + string(router.apiVersion)
-		
+		prefix := "/api/" + string(router.apiVersion)
 
 		h.mux.Handle(
 			//убираем префик, потому что фичи о нём знать не обязательно
