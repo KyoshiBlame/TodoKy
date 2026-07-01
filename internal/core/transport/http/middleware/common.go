@@ -98,7 +98,7 @@ func Trace() Middleware {
 				"<<< done HTTP request",
 				zap.Int("Status code ", rw.GetStatusCodeOrPanic()),
 				//счиатаем сколько время заняло выполнения запроса
-				zap.Duration("latency", time.Now().Sub(before)),
+				zap.Duration("latency", time.Since(before)),
 			)
 		})
 	} 
