@@ -1,8 +1,6 @@
 package users_transport_http
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
@@ -29,19 +27,38 @@ func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
-	responseHander := core_http_response.NewHTTPResponseHandler(log, w)
+	responseHandler := core_http_response.NewHTTPResponseHandler(log, w)
 
 	var request CreateUsersRequest
 
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
-		responseHander.ErrorResponse(err, "failed to decode and validate request")
+		responseHandler.ErrorResponse(err, "failed to decode and validate request")
 
 		return
 	}
 
-	h.UsersService.CreateUser(ctx, domainFromDTO())
+	userDomain := domainFromDTO(request)
+
+	userDomain, err := h.UsersService.CreateUser(ctx, userDomain)
+	if err != nil {
+		responseHandler.ErrorResponse(err, "failed to create user")
+	}
+
+	response := dtoFromDomain(userDomain)
+
+	responseHandler.JSONResponse(response, http.StatusCreated)
+
 }
 
 func domainFromDTO(dto CreateUsersRequest) domain.User {
-	return domain.NewUser(dto.FullName, dto.PhoneNumber)
+	return domain.NewUserUninitialized(dto.FullName, dto.PhoneNumber)
+}
+
+func dtoFromDomain(user domain.User) CreateUserResponse {
+	return CreateUserResponse{
+		ID: user.ID,
+		Version: user.Version,
+		FullName: user.FullName,
+		PhoneNumber: user.PhoneNumber,
+	}
 }

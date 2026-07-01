@@ -9,6 +9,7 @@ import (
 	core_errors "github.com/KyoshiBlame/TodoKy/internal/core/errors"
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
 	"go.uber.org/zap"
+	"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
 
 type HTTPResponseHandler struct {
@@ -26,21 +27,32 @@ func NewHTTPResponseHandler(
 	}
 }
 
+func (h *HTTPResponseHandler) JSONResponse(
+	responseBody any,
+	statusCode int,
+) {
+	h.rw.WriteHeader(statusCode)
+
+	if err := json.NewEncoder(h.rw).Encode(responseBody); err != nil {
+		h.log.Error("write HTTP response", zap.Error(err))
+	}
+}
+
 func (h *HTTPResponseHandler) errorHandler(
 	statusCode int,
 	err error,
 	msg string,
 ) {
-	h.rw.WriteHeader(statusCode)
 
 	response := map[string]string{
 		"message": msg,
 		"error":   err.Error(),
 	}
 
-	if err := json.NewEncoder(h.rw).Encode(response); err != nil {
-		h.log.Error("write HTTP response", zap.Error(err))
-	}
+	h.JSONResponse(
+		response,
+		statusCode,
+	)
 
 }
 
