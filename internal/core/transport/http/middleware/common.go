@@ -6,7 +6,7 @@ import (
 	"time"
 
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
-	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/resposnse"
+	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
