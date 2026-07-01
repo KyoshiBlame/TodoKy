@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
 	core_http_request "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/request"
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
@@ -30,16 +31,17 @@ func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	log := core_logger.FromContext(ctx)
 	responseHander := core_http_response.NewHTTPResponseHandler(log, w)
 
-	log.Debug("invoke CreateUser handler")
-
 	var request CreateUsersRequest
 
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
 		responseHander.ErrorResponse(err, "failed to decode and validate request")
-	}
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		fmt.Println("произошла ашибка")
+
+		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	h.UsersService.CreateUser(ctx, domainFromDTO())
+}
+
+func domainFromDTO(dto CreateUsersRequest) domain.User {
+	return domain.NewUser(dto.FullName, dto.PhoneNumber)
 }
