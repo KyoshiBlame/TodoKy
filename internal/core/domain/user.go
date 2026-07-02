@@ -43,7 +43,7 @@ func NewUserUninitialized(
 	)
 }
 
-func (u *User) Validata() error {
+func (u *User) Validate() error {
 	fullNameLens := len([]rune(u.FullName))
 
 	if fullNameLens < 3 || fullNameLens > 100 {
