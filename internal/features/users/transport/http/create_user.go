@@ -11,7 +11,7 @@ import (
 
 type CreateUsersRequest struct {
 	FullName    string  `json:"full_name" validate:"required,min=3,max=100"`
-	PhoneNumber *string `json:"phone_number" validate:"omiempty,min=10,max=15,startswith=+"`
+	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
 }
 
 //omiempty - если не передали в dto то и правила валидации применять не нужно | required - обязательное поле
@@ -56,9 +56,9 @@ func domainFromDTO(dto CreateUsersRequest) domain.User {
 
 func dtoFromDomain(user domain.User) CreateUserResponse {
 	return CreateUserResponse{
-		ID: user.ID,
-		Version: user.Version,
-		FullName: user.FullName,
+		ID:          user.ID,
+		Version:     user.Version,
+		FullName:    user.FullName,
 		PhoneNumber: user.PhoneNumber,
 	}
 }

@@ -42,34 +42,34 @@ func NewUserUninitialized(
 }
 
 func (u *User) Validate() error {
-	fullNameLens := len([]rune(u.FullName))
+	fullNameLen := len([]rune(u.FullName))
 
-	if fullNameLens < 3 || fullNameLens > 100 {
+	if fullNameLen < 3 || fullNameLen > 100 {
 		return fmt.Errorf(
-			"invalid `Fullnames` lenght: %d: %w",
-			fullNameLens,
+			"invalid `FullName` length: %d: %w",
+			fullNameLen,
 			core_errors.ErrInvalidArgument,
 		)
 	}
 
 	if u.PhoneNumber != nil {
-		phomeNumberLen := len([]rune(*u.PhoneNumber))
-		if phomeNumberLen < 10 || phomeNumberLen > 15 {
+		phoneNumberLen := len([]rune(*u.PhoneNumber))
+
+		if phoneNumberLen < 10 || phoneNumberLen > 15 {
 			return fmt.Errorf(
-				"invalid `PhoneNumbers` lenght %d:%w",
-				phomeNumberLen,
+				"invalid `PhoneNumber` length: %d: %w",
+				phoneNumberLen,
 				core_errors.ErrInvalidArgument,
 			)
 		}
-	}
 
-	re := regexp.MustCompile(`^\+[0-9]+$`)
-
-	if !re.MatchString(*u.PhoneNumber) {
-		return fmt.Errorf(
-			"invalid `PhoneNumbers` format: %w",
-			core_errors.ErrInvalidArgument,
-		)
+		re := regexp.MustCompile(`^\+[0-9]+$`)
+		if !re.MatchString(*u.PhoneNumber) {
+			return fmt.Errorf(
+				"invalid `PhoneNumber` format: %w",
+				core_errors.ErrInvalidArgument,
+			)
+		}
 	}
 
 	return nil
