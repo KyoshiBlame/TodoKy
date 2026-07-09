@@ -54,7 +54,12 @@ migrate-action:
 		-database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoky-postgres:5432/${POSTGRES_DB}?sslmode=disable" \
 		"$(action)"
 
+logs-clean:
+	@rm -rf "$(PROJECT_ROOT)/out/logs"
+	@echo "Папка логов очищена"
+
 todoky-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
+	go mod tidy && \
 	go run ./cmd/todoky
