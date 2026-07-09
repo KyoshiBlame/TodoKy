@@ -6,7 +6,6 @@ import (
 	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
 )
 
-
 type UsersService struct {
 	usersRepository UsersRepository
 }
@@ -16,9 +15,9 @@ type UsersRepository interface {
 }
 
 func NewUsersService(
-	usersRepository UsersRepository
+	usersRepository UsersRepository,
 ) *UsersService {
 	return &UsersService{
 		usersRepository: usersRepository,
-	}	
+	}
 }

@@ -7,14 +7,12 @@ import (
 	core_errors "github.com/KyoshiBlame/TodoKy/internal/core/errors"
 )
 
-
-
 type User struct {
-	ID int
+	ID      int
 	Version int
 
-	FullName string
-	PhoneNumber *string//ссылка т.к номер не обязателен
+	FullName    string
+	PhoneNumber *string //ссылка т.к номер не обязателен
 }
 
 func NewUser(
@@ -24,15 +22,15 @@ func NewUser(
 	phone_number *string,
 ) User {
 	return User{
-		ID: id,
-		Version: version,
-		FullName: fullname,
+		ID:          id,
+		Version:     version,
+		FullName:    fullname,
 		PhoneNumber: phone_number,
 	}
 }
 
 func NewUserUninitialized(
-	fullname string, 
+	fullname string,
 	phone_number *string,
 ) User {
 	return NewUser(
@@ -70,7 +68,7 @@ func (u *User) Validate() error {
 	if !re.MatchString(*u.PhoneNumber) {
 		return fmt.Errorf(
 			"invalid `PhoneNumbers` format: %w",
-				core_errors.ErrInvalidArgument,
+			core_errors.ErrInvalidArgument,
 		)
 	}
 

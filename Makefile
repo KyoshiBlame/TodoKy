@@ -16,8 +16,7 @@ env-clean-up:
 	@printf "Очистить все файлы окружения? Возможна потеря данных. [y/N]: "; \
 	read ans; \
 	if [ "$$ans" = "y" ]; then \
-		docker compose down && \
-		rm -rf out/pgdata && \
+		docker compose down -v && \
 		echo "Файлы окружения очищены"; \
 	else \
 		echo "Очистка окружения отменена"; \
