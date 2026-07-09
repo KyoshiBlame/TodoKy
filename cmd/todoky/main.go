@@ -8,8 +8,11 @@ import (
 	"syscall"
 
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
+	core_postgres_pool "github.com/KyoshiBlame/TodoKy/internal/core/repository/postgres/pool"
 	core_http_middleware "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/middleware"
 	core_http_server "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/server"
+	users_postgres_repository "github.com/KyoshiBlame/TodoKy/internal/features/users/repository/postgres"
+	users_service "github.com/KyoshiBlame/TodoKy/internal/features/users/service"
 	users_transport_http "github.com/KyoshiBlame/TodoKy/internal/features/users/transport/http"
 	"go.uber.org/zap"
 )
@@ -29,14 +32,25 @@ func main() {
 	}
 	defer logger.Close()
 
-	logger.Debug("Starting TodoKy")
+	logger.Debug("initiazling postgres connection pool")
+	pool, err := core_postgres_pool.NewConnectionPool(
+		ctx,
+		core_postgres_pool.NewConfigMust(),
+	)
 
-	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(nil)
-	usersRoutes := usersTransportHTTP.Routes()
+	if err != nil {
+		logger.Fatal("failed to init posgres connection pool", zap.Error(err))
+	}
+	defer pool.Close()
 
-	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
-	apiVersionRouter.RegisterRoutes(usersRoutes...)
-	
+	logger.Debug("initializing feature", zap.String("feature", "users"))
+	usersRepository := users_postgres_repository.NewUsersRepository(pool)
+	usersService := users_service.NewUsersService(usersRepository)
+
+	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
+
+	logger.Debug("initializing HTTP server")
+
 	httpServer := core_http_server.NewHTTPServer(
 		core_http_server.NewConfigMust(),
 		logger,
@@ -46,6 +60,8 @@ func main() {
 		core_http_middleware.Trace(),
 	)
 
+	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
+	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
 	httpServer.RegisterAPIRouters(apiVersionRouter)
 
 	if err := httpServer.Run(ctx); err != nil {

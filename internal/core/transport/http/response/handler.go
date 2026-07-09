@@ -9,7 +9,6 @@ import (
 	core_errors "github.com/KyoshiBlame/TodoKy/internal/core/errors"
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
 	"go.uber.org/zap"
-	"golang.org/x/tools/go/analysis/passes/nilfunc"
 )
 
 type HTTPResponseHandler struct {
@@ -95,7 +94,7 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 	logFunc(msg, zap.Error(err))
 
 	h.errorHandler(
-		statusCode, 
+		statusCode,
 		err,
 		msg,
 	)
