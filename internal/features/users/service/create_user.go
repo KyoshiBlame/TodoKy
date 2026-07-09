@@ -7,12 +7,11 @@ import (
 	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
 )
 
-
 func (s *UsersService) CreateUser(
 	ctx context.Context,
-	user domain.User, 
+	user domain.User,
 ) (domain.User, error) {
-	if err := user.Validate(); err != nil { 
+	if err := user.Validate(); err != nil {
 		return domain.User{}, fmt.Errorf("Validate user domain: %w", err)
 	}
 
