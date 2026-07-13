@@ -1,0 +1,15 @@
+package users_postgres_repository
+
+import core_postgres_pool "github.com/KyoshiBlame/TodoKy/internal/core/repository/postgres/pool"
+
+type UsersRepository struct {
+	pool *core_postgres_pool.ConnectionPool
+}
+
+func NewUsersRepository(
+	pool *core_postgres_pool.ConnectionPool,
+) *UsersRepository {
+	return &UsersRepository{
+		pool: pool,
+	}
+}

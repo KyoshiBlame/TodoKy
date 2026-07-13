@@ -16,8 +16,7 @@ env-clean-up:
 	@printf "Очистить все файлы окружения? Возможна потеря данных. [y/N]: "; \
 	read ans; \
 	if [ "$$ans" = "y" ]; then \
-		docker compose down && \
-		rm -rf out/pgdata && \
+		docker compose down -v && \
 		echo "Файлы окружения очищены"; \
 	else \
 		echo "Очистка окружения отменена"; \
@@ -55,5 +54,12 @@ migrate-action:
 		-database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@todoky-postgres:5432/${POSTGRES_DB}?sslmode=disable" \
 		"$(action)"
 
-test-target:
-	@echo "value: $(var)"
+logs-clean:
+	@rm -rf "$(PROJECT_ROOT)/out/logs"
+	@echo "Папка логов очищена"
+
+todoky-run:
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	export POSTGRES_HOST=localhost && \
+	go mod tidy && \
+	go run ./cmd/todoky
