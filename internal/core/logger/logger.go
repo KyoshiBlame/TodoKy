@@ -11,6 +11,18 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type loggerContextKey struct{}
+
+var key = loggerContextKey{}
+
+func ToContext(ctx context.Context, log *Logger) context.Context {
+	return context.WithValue(
+		ctx,
+		key,
+		log,
+	)
+}
+
 type Logger struct {
 	*zap.Logger
 
@@ -19,7 +31,7 @@ type Logger struct {
 
 // получаем логгер через контекст
 func FromContext(ctx context.Context) *Logger {
-	log, ok := ctx.Value("log").(*Logger)
+	log, ok := ctx.Value(key).(*Logger)
 
 	if !ok {
 		panic("no logger in context")
@@ -64,7 +76,7 @@ func NewLogger(config LoggerConfig) (*Logger, error) {
 
 	return &Logger{
 		Logger: zapLogger,
-		file: logFile,
+		file:   logFile,
 	}, nil
 }
 
@@ -77,6 +89,6 @@ func (l *Logger) Close() {
 func (l *Logger) With(field ...zap.Field) *Logger {
 	return &Logger{
 		Logger: l.Logger.With(field...),
-		file: l.file,
+		file:   l.file,
 	}
 }

@@ -1,7 +1,6 @@
 package core_http_middleware
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -13,10 +12,10 @@ import (
 
 const RequestIDHeader = "X-Request-ID"
 
-//middleware для идентификации запросов для удобства логов
+// middleware для идентификации запросов для удобства логов
 func RequestID() Middleware {
 	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			requestID := r.Header.Get(RequestIDHeader)
 			if requestID == "" {
@@ -25,60 +24,36 @@ func RequestID() Middleware {
 
 			r.Header.Set(RequestIDHeader, requestID)
 			w.Header().Set(RequestIDHeader, requestID)
-			
-			next.ServeHTTP(w,r)
+
+			next.ServeHTTP(w, r)
 
 		})
 	}
 }
 
-//logger
+// logger
 func Logger(log *core_logger.Logger) Middleware {
-	return func (next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			RequestID := r.Header.Get(RequestIDHeader)
-			
+
 			//Переопределил метод With чтобы возвращала мой логгер
 			l := log.With(
 				zap.String("request_id", RequestID),
 				zap.String("url", r.URL.String()),
 			)
-			
-			ctx := context.WithValue(r.Context(), "log", l)//по ключу log передаём наш логгер
+
+			ctx := core_logger.ToContext(r.Context(), l)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-//ловец-обработчик паник которые могут появиться после иполнения запроса
-func Panic() Middleware {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-			ctx := r.Context()
-			//получаем логгер через контекст
-			log := core_logger.FromContext(ctx)
-
-			responseHandler := core_http_response.NewHTTPResponseHandler(log, w)
-
-			defer func () {
-				if p := recover(); p != nil {
-					responseHandler.PanicResponse(
-						p, 
-						"during, handle HTTP request got unexpected panic",
-					)
-				}
-			}()
-
-			next.ServeHTTP(w,r)
-		})
-	}
-}
-
-//логирование общеё информации о запросах
+// логирование общеё информации о запросах
 func Trace() Middleware {
 	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			ctx := r.Context()
 			log := core_logger.FromContext(ctx)
@@ -92,14 +67,38 @@ func Trace() Middleware {
 				zap.Time("time", time.Now().UTC()),
 			)
 
-			next.ServeHTTP(rw,r)
+			next.ServeHTTP(rw, r)
 
 			log.Debug(
 				"<<< done HTTP request",
-				zap.Int("Status code ", rw.GetStatusCodeOrPanic()),
+				zap.Int("Status code ", rw.GetStatusCode()),
 				//счиатаем сколько время заняло выполнения запроса
 				zap.Duration("latency", time.Since(before)),
 			)
 		})
-	} 
+	}
+}
+
+// ловец-обработчик паник которые могут появиться после иполнения запроса
+func Panic() Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			//получаем логгер через контекст
+			log := core_logger.FromContext(ctx)
+
+			responseHandler := core_http_response.NewHTTPResponseHandler(log, w)
+
+			defer func() {
+				if p := recover(); p != nil {
+					responseHandler.PanicResponse(
+						p,
+						"during, handle HTTP request got unexpected panic",
+					)
+				}
+			}()
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
