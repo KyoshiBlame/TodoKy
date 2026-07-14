@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
-	core_postgres_pool "github.com/KyoshiBlame/TodoKy/internal/core/repository/postgres/pool"
+	core_pgx_pool "github.com/KyoshiBlame/TodoKy/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/middleware"
 	core_http_server "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/server"
 	users_postgres_repository "github.com/KyoshiBlame/TodoKy/internal/features/users/repository/postgres"
@@ -33,11 +33,7 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("initiazling postgres connection pool")
-	pool, err := core_postgres_pool.NewConnectionPool(
-		ctx,
-		core_postgres_pool.NewConfigMust(),
-	)
-
+	pool, err := core_pgx_pool.NewPool(ctx, core_pgx_pool.NewConfigMust())
 	if err != nil {
 		logger.Fatal("failed to init posgres connection pool", zap.Error(err))
 	}
