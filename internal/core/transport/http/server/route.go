@@ -1,23 +1,21 @@
 package core_http_server
 
-import "net/http"
+import (
+	"net/http"
 
+	core_http_middleware "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/middleware"
+)
 
 type Route struct {
-	Method string
-	Path string
-	Handler http.HandlerFunc
+	Method     string
+	Path       string
+	Handler    http.HandlerFunc
+	Middleware []core_http_middleware.Middleware
 }
 
-//Механика которая даёт возможность каждой фиче определять свой набор роутов, методой, путей и хендлеров
-func NewRoute(
-	Method string,
-	Path string,
-	Handler http.HandlerFunc,
-) *Route {
-	return &Route {
-		Method: Method,
-		Path: Path,
-		Handler: Handler,
-	}
+func (r *Route) WithMiddleware() http.Handler {
+	return core_http_middleware.ChainMiddleware(
+		r.Handler,
+		r.Middleware...,
+	)
 }
