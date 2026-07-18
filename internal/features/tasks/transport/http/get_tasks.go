@@ -9,14 +9,14 @@ import (
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 )
 
-type GetTasksResponse TaskDTOResponse
+type GetTasksResponse []TaskDTOResponse
 
 func (h *TaskHTTPHandler) GetTasks(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	userID, limit, offset, err := getUserIDLimitOffsetQueryParams(r)
+	limit, offset, userID, err := getUserIDLimitOffsetQueryParams(r)
 	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
@@ -34,6 +34,12 @@ func (h *TaskHTTPHandler) GetTasks(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := GetTasksResponse(taskDTosFromDomains(tasksDomain))
+
+	responseHandler.JSONResponse(
+		response,
+		http.StatusOK,
+	)
 }
 
 func getUserIDLimitOffsetQueryParams(r *http.Request) (*int, *int, *int, error) {

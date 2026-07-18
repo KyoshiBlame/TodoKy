@@ -41,5 +41,10 @@ func (h *TaskHTTPHandler) Routes() []core_http_server.Route {
 			Path:    "/tasks",
 			Handler: h.CreateTask,
 		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/tasks",
+			Handler: h.GetTasks,
+		},
 	}
 }
