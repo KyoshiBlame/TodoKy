@@ -8,7 +8,9 @@ import (
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 )
 
-func (h *TaskHTTPHandler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
+type taskDTOResponse TaskDTOResponse
+
+func (h *TaskHTTPHandler) GetTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
@@ -22,13 +24,20 @@ func (h *TaskHTTPHandler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.tasksService.DeleteTask(ctx, taskID); err != nil {
+	domainTask, err := h.tasksService.GetTask(ctx, taskID)
+	if err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to delete task",
+			"failed to get task",
 		)
 		return
 	}
 
-	responseHandler.NoContentResponse()
+	response := taskDTOResponse(taskDTOFromDomain(domainTask))
+
+	responseHandler.JSONResponse(
+		response,
+		http.StatusOK,
+	)
+
 }
