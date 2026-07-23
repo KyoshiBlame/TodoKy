@@ -12,31 +12,33 @@ import (
 )
 
 type PatchTaskRequest struct {
-	title       core_http_types.Nullable[string] `json:"title"`
-	description core_http_types.Nullable[string] `json:"description"`
-	completed   core_http_types.Nullable[bool]   `json:"completed"`
+	Title       core_http_types.Nullable[string] `json:"title"`
+	Description core_http_types.Nullable[string] `json:"description"`
+	Completed   core_http_types.Nullable[bool]   `json:"completed"`
 }
 
 type TaskPatchedResponse taskDTOResponse
 
 func (r *PatchTaskRequest) Validate() error {
-	if r.title.Set {
+	if r.Title.Set {
 
-		if r.title.Value == nil {
+		if r.Title.Value == nil {
 			return fmt.Errorf("'Titile can't be NULL")
 		}
 
-		lenTitle := len([]rune(*r.title.Value))
+		lenTitle := len([]rune(*r.Title.Value))
 		if lenTitle < 1 || lenTitle > 100 {
 			return fmt.Errorf("'Title' must be between 1 and 100")
 		}
 
 	}
 
-	if r.description.Set {
-		descLen := len([]rune(*r.description.Value))
-		if descLen < 1 || descLen > 1000 {
-			return fmt.Errorf("'Description' must be between 1 and 1000")
+	if r.Description.Set {
+		if r.Description.Value != nil {
+			descLen := len([]rune(*r.Description.Value))
+			if descLen < 1 || descLen > 1000 {
+				return fmt.Errorf("'Description' must be between 1 and 1000")
+			}
 		}
 	}
 
@@ -54,6 +56,7 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 			err,
 			"failed to get 'id' from path",
 		)
+		return
 	}
 
 	var request PatchTaskRequest
@@ -62,6 +65,7 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 			err,
 			"failed to decode and validate HTTp request",
 		)
+		return
 	}
 
 	taskPatch := TaskPatchFromRequest(request)
@@ -72,6 +76,7 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 			err,
 			"failed to path task",
 		)
+		return
 	}
 
 	response := TaskPatchedResponse(taskDTOFromDomain(taskDomain))
@@ -85,8 +90,8 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 
 func TaskPatchFromRequest(request PatchTaskRequest) domain.TaskPatch {
 	return domain.NewTaskPatch(
-		request.title.ToDomain(),
-		request.description.ToDomain(),
-		request.completed.ToDomain(),
+		request.Title.ToDomain(),
+		request.Description.ToDomain(),
+		request.Completed.ToDomain(),
 	)
 }

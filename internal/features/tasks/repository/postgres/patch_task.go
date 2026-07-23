@@ -19,7 +19,7 @@ func (r *TasksRepository) PatchTask(
 	defer cancel()
 
 	query := `
-	UPDATE todoky.task
+	UPDATE todoky.tasks
 	SET
 		title=$1,
 		description=$2,
@@ -31,8 +31,11 @@ func (r *TasksRepository) PatchTask(
 		id,
 		version,
 		title,
-		description;
-		completed;
+		description,
+		completed,
+		created_at,
+		completed_at,
+		author_user_id
 	`
 
 	row := r.pool.QueryRow(
@@ -42,6 +45,8 @@ func (r *TasksRepository) PatchTask(
 		task.Description,
 		task.Completed,
 		task.CompletedAt,
+		task.ID,
+		task.Version,
 	)
 
 	var taskModel TaskModel
@@ -52,7 +57,9 @@ func (r *TasksRepository) PatchTask(
 		&taskModel.Title,
 		&taskModel.Description,
 		&taskModel.Completed,
+		&taskModel.CreateAt,
 		&taskModel.CompletedAt,
+		&taskModel.AuthorUserID,
 	)
 
 	if err != nil {
