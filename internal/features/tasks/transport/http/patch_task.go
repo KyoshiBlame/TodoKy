@@ -42,6 +42,12 @@ func (r *PatchTaskRequest) Validate() error {
 		}
 	}
 
+	if r.Completed.Set {
+		if r.Completed.Value == nil {
+			return fmt.Errorf("completed cant be nill")
+		}
+	}
+
 	return nil
 }
 
@@ -63,7 +69,7 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 	if err := core_http_request.DecodeAndValidateRequest(r, &request); err != nil {
 		responseHandler.ErrorResponse(
 			err,
-			"failed to decode and validate HTTp request",
+			"failed to decode and validate HTTP request",
 		)
 		return
 	}
