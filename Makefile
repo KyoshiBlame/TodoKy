@@ -63,3 +63,9 @@ todoky-run:
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
 	go run ./cmd/todoky
+
+todoky-deploy:
+	@docker compose up -d --build todoky
+
+ps:
+	@docker compose ps
