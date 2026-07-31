@@ -60,5 +60,11 @@ services:
       todoky-postgres:
         condition: service_healthy
 
+  swagger:
+    build:
+      context: ${PROJECT_ROOT}
+      dockerfile_inline:  |
+        FROM golang 
+
 volumes:
   todoky-postgres-data:
