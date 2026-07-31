@@ -67,5 +67,8 @@ todoky-run:
 todoky-deploy:
 	@docker compose up -d --build todoky
 
+todoky-undeploy:
+	@docker compose down todoky
+
 ps:
 	@docker compose ps
