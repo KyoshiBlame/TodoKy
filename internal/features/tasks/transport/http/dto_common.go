@@ -7,14 +7,14 @@ import (
 )
 
 type TaskDTOResponse struct {
-	ID           int        `json:"id"`
-	Version      int        `json:"version"`
-	Titile       string     `json:"title"`
-	Description  *string    `json:"description"`
-	Completed    bool       `json:"completed"`
-	CreatedAt    time.Time  `json:"created_at"`
-	CompletedAt  *time.Time `json:"completed_at"`
-	AuthorUserID int        `json:"author_user_id"`
+	ID           int        `json:"id" example:"3"`
+	Version      int        `json:"version" example:"1"`
+	Titile       string     `json:"title" example:"Сходить в магазин"`
+	Description  *string    `json:"description" example:"Купить рис, курицу и молоко"`
+	Completed    bool       `json:"completed" example:"false"`
+	CreatedAt    time.Time  `json:"created_at" example:"04.08.2026 17:01:00"`
+	CompletedAt  *time.Time `json:"completed_at" example:""`
+	AuthorUserID int        `json:"author_user_id" example:"3"`
 }
 
 func taskDTOFromDomain(task domain.Task) TaskDTOResponse {
