@@ -55,6 +55,15 @@ func (h *HTTPResponseHandler) errorHandler(
 
 }
 
+func (h *HTTPResponseHandler) HTMLResponse(html []byte) {
+	h.rw.WriteHeader(http.StatusOK)
+
+	h.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if _, err := h.rw.Write(html); err != nil {
+		h.log.Error("write HTML response")
+	}
+}
+
 // метод для отправки http ответа в случае паники приложения
 func (h *HTTPResponseHandler) PanicResponse(p any, msg string) {
 	statusCode := http.StatusInternalServerError

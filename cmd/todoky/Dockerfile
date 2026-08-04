@@ -14,4 +14,8 @@ WORKDIR /app
 
 COPY --from=builder /app/todoky /app/todoky
 
+COPY --from=builder /app/public /app/public
+
+ENV PROJECT_ROOT=/app
+
 CMD ["/app/todoky"]
