@@ -21,6 +21,9 @@ import (
 	users_postgres_repository "github.com/KyoshiBlame/TodoKy/internal/features/users/repository/postgres"
 	users_service "github.com/KyoshiBlame/TodoKy/internal/features/users/service"
 	users_transport_http "github.com/KyoshiBlame/TodoKy/internal/features/users/transport/http"
+	web_fs_repository "github.com/KyoshiBlame/TodoKy/internal/features/web/repository/file_system"
+	web_service "github.com/KyoshiBlame/TodoKy/internal/features/web/service"
+	web_transport_http "github.com/KyoshiBlame/TodoKy/internal/features/web/transport/http"
 	"go.uber.org/zap"
 
 	_ "github.com/KyoshiBlame/TodoKy/docs"
@@ -76,6 +79,11 @@ func main() {
 	statisticsService := statistics_service.NewStatiscticsService(statisticsRepository)
 	statisticsTransportHTTP := statistics_transport_http.NewStatiscticsHTTPHandler(statisticsService)
 
+	logger.Debug("initializing feature", zap.String("feature", "web"))
+	webRepo := web_fs_repository.NewWebRepository()
+	webServ := web_service.NewWebService(webRepo)
+	webTransportHTTP := web_transport_http.NewWebHTTPHandler(webServ)
+
 	logger.Debug("initializing HTTP server")
 
 	httpServer := core_http_server.NewHTTPServer(
@@ -95,6 +103,7 @@ func main() {
 	httpServer.RegisterAPIRouters(apiVersionRouterV1)
 
 	httpServer.RegisterSwagger()
+	httpServer.RegisterRoutes(webTransportHTTP.Routes()...)
 
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))
