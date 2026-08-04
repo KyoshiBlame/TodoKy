@@ -1,0 +1,574 @@
+basePath: /api/v1
+definitions:
+  github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse:
+    properties:
+      error:
+        example: full error text
+        type: string
+      message:
+        example: short text for human
+        type: string
+    type: object
+  internal_features_statistics_transport.GetStatisticsResponse:
+    properties:
+      tasks_avg_completion_time:
+        example: 1m30s
+        type: string
+      tasks_completed:
+        example: 5
+        type: integer
+      tasks_completed_rate:
+        example: 50
+        type: number
+      tasks_created:
+        example: 10
+        type: integer
+    type: object
+  internal_features_tasks_transport_http.CreateTaskRequest:
+    properties:
+      author_user_id:
+        example: 1
+        type: integer
+      description:
+        example: Купить рис, курицу и молока
+        maxLength: 1000
+        minLength: 1
+        type: string
+      title:
+        example: Сходить в магазин
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - author_user_id
+    - title
+    type: object
+  internal_features_tasks_transport_http.CreateTaskResponse:
+    properties:
+      author_user_id:
+        example: 3
+        type: integer
+      completed:
+        example: false
+        type: boolean
+      completed_at:
+        example: ""
+        type: string
+      created_at:
+        example: 04.08.2026 17:01:00
+        type: string
+      description:
+        example: Купить рис, курицу и молоко
+        type: string
+      id:
+        example: 3
+        type: integer
+      title:
+        example: Сходить в магазин
+        type: string
+      version:
+        example: 1
+        type: integer
+    type: object
+  internal_features_tasks_transport_http.PatchTaskRequest:
+    properties:
+      completed:
+        type: boolean
+      description:
+        example: Погулять с пушком в новом парке
+        type: string
+      title:
+        example: Сходить в магазин
+        type: string
+    type: object
+  internal_features_tasks_transport_http.TaskDTOResponse:
+    properties:
+      author_user_id:
+        example: 3
+        type: integer
+      completed:
+        example: false
+        type: boolean
+      completed_at:
+        example: ""
+        type: string
+      created_at:
+        example: 04.08.2026 17:01:00
+        type: string
+      description:
+        example: Купить рис, курицу и молоко
+        type: string
+      id:
+        example: 3
+        type: integer
+      title:
+        example: Сходить в магазин
+        type: string
+      version:
+        example: 1
+        type: integer
+    type: object
+  internal_features_tasks_transport_http.TaskPatchedResponse:
+    properties:
+      author_user_id:
+        example: 3
+        type: integer
+      completed:
+        example: false
+        type: boolean
+      completed_at:
+        example: ""
+        type: string
+      created_at:
+        example: 04.08.2026 17:01:00
+        type: string
+      description:
+        example: Купить рис, курицу и молоко
+        type: string
+      id:
+        example: 3
+        type: integer
+      title:
+        example: Сходить в магазин
+        type: string
+      version:
+        example: 1
+        type: integer
+    type: object
+  internal_features_users_transport_http.CreateUserResponse:
+    properties:
+      full_name:
+        example: Nikita Morozoc
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: +7 999 322 52 42
+        type: string
+      version:
+        example: 2
+        type: integer
+    type: object
+  internal_features_users_transport_http.CreateUsersRequest:
+    properties:
+      full_name:
+        example: Nikita Morozov
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone_number:
+        example: +7 999 322 52 42
+        maxLength: 15
+        minLength: 10
+        type: string
+    required:
+    - full_name
+    type: object
+  internal_features_users_transport_http.GetUserResponse:
+    properties:
+      full_name:
+        example: Nikita Morozoc
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: +7 999 322 52 42
+        type: string
+      version:
+        example: 2
+        type: integer
+    type: object
+  internal_features_users_transport_http.PatchUserRequest:
+    properties:
+      full_name:
+        example: Максим Максимович
+        type: string
+      phone_number:
+        example: +7 999 222 44 22
+        type: string
+    type: object
+  internal_features_users_transport_http.PatchUserResponse:
+    properties:
+      full_name:
+        example: Nikita Morozoc
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: +7 999 322 52 42
+        type: string
+      version:
+        example: 2
+        type: integer
+    type: object
+  internal_features_users_transport_http.UserDTOResponse:
+    properties:
+      full_name:
+        example: Nikita Morozoc
+        type: string
+      id:
+        example: 10
+        type: integer
+      phone_number:
+        example: +7 999 322 52 42
+        type: string
+      version:
+        example: 2
+        type: integer
+    type: object
+host: 172.21.253.37:5050
+info:
+  contact: {}
+  description: Todo application REST-API
+  title: todoky
+  version: "1.0"
+paths:
+  /statistics:
+    get:
+      description: Получить статистику о существующий задачах в системе
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно полученная статистика
+          schema:
+            $ref: '#/definitions/internal_features_statistics_transport.GetStatisticsResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal sercer error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Статистика задач
+      tags:
+      - Statistics
+  /tasks:
+    get:
+      description: Получение задач с опциональной пагинацией
+      parameters:
+      - description: Размер страницы с задачами
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение страницы с задачами
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение списка задач
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_tasks_transport_http.TaskDTOResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Получения списка задач
+      tags:
+      - Tasks
+    post:
+      consumes:
+      - application/json
+      description: Создать новую задачу в системе
+      parameters:
+      - description: CreateTask тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_tasks_transport_http.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно созданная задача
+          schema:
+            $ref: '#/definitions/internal_features_tasks_transport_http.CreateTaskResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Author not found
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal sercer error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Создать задачу
+      tags:
+      - Tasks
+  /tasks/{id}:
+    delete:
+      description: Удалить существующую задачу в системе
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: Успешно удалена задача
+        "404":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal sercer error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Удалить задачу
+      tags:
+      - Tasks
+    get:
+      description: Получить задачу из системы
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение задачи
+          schema:
+            $ref: '#/definitions/internal_features_tasks_transport_http.CreateTaskResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal sercer error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Получить задачу
+      tags:
+      - Tasks
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        Изменить существующую задачу в системе
+        ### Логика обновления полей (Three-state logic):
+        1. **Поле не передано**: `description` игнорируется, значение в БД не меняется
+        2. **Явно передано значение**: `"description":"помыть лапки собаке"` - устанавливает новый номер в БД
+        3. **Передано NULL**: `"description":null` - очистит поле в БД (set NULL)
+        Ограниечение: `title` не может быть выставлен как NULL
+      parameters:
+      - description: ID изменяемой задачи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: PatchTaskRequest тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_tasks_transport_http.PatchTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное изменение задачи
+          schema:
+            $ref: '#/definitions/internal_features_tasks_transport_http.TaskPatchedResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Изменнение задачи
+      tags:
+      - Tasks
+  /users:
+    get:
+      description: Получение пользователей с опциональной пагинацией
+      parameters:
+      - description: Размер страницы с пользователями
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение страницы с пользователями
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение списка пользователей
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_users_transport_http.UserDTOResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Получения списка пользователей
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Создать нового пользователя в системе
+      parameters:
+      - description: CreateUser тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_users_transport_http.CreateUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешно созданный пользователь
+          schema:
+            $ref: '#/definitions/internal_features_users_transport_http.CreateUserResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal sercer error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Создать пользователя
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Удалить сущетсвующего пользователя из системе
+      parameters:
+      - description: ID удаляемого пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: Успешное удаление пользователя
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Удаление пользователя
+      tags:
+      - Users
+    get:
+      description: Получить сущетсвующего пользователя из системы
+      parameters:
+      - description: ID получаемого пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение пользователя
+          schema:
+            $ref: '#/definitions/internal_features_users_transport_http.GetUserResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Получения пользователя
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        Изменить существующего пользователя в системе
+        ### Логика обновления полей (Three-state logic):
+        1. **Поле не передано**: `phone_number` игнорируется, значение в БД не меняется
+        2. **Явно передано значение**: `"phone_number":"+72223331122"` - устанавливает новый номер в БД
+        3. **Передано NULL**: `"phone_number":null` - очистит поле в БД (set NULL)
+        Ограниечение: `full_name` не может быть выставлен как NULL
+      parameters:
+      - description: ID изменяемого пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: PatchUserRequest тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_users_transport_http.PatchUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное изменение пользователя
+          schema:
+            $ref: '#/definitions/internal_features_users_transport_http.PatchUserResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_KyoshiBlame_TodoKy_internal_core_transport_http_response.ErrorResponse'
+      summary: Изменнение пользователя
+      tags:
+      - Users
+swagger: "2.0"

@@ -10,14 +10,24 @@ import (
 )
 
 type CreateUsersRequest struct {
-	FullName    string  `json:"full_name" validate:"required,min=3,max=100"`
-	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
+	FullName    string  `json:"full_name" validate:"required,min=3,max=100" example:"Nikita Morozov"`
+	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+" example:"+7 999 322 52 42"`
 }
 
 type CreateUserResponse UserDTOResponse
 
-//omiempty - если не передали в dto то и правила валидации применять не нужно | required - обязательное поле
-
+// omiempty - если не передали в dto то и правила валидации применять не нужно | required - обязательное поле
+// CreateUser 	godoc
+// @Summary 	Создать пользователя
+// @Description Создать нового пользователя в системе
+// @Tags 		Users
+// @Accept 		json
+// @Produce 	json
+// @Param 		request body CreateUsersRequest true "CreateUser тело запроса"
+// @Success 	201 {object} CreateUserResponse "Успешно созданный пользователь"
+// @Failure 	400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 	500 {object} core_http_response.ErrorResponse "Internal sercer error"
+// @Router 		/users [post]
 func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()

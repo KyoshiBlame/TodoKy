@@ -70,5 +70,13 @@ todoky-deploy:
 todoky-undeploy:
 	@docker compose down todoky
 
+swagger-gem:
+	@docker compose run --rm swagger \
+		init \
+		-g cmd/todoky/main.go \
+		-o docs \
+		--parseInternal \
+		--parseDependency
+
 ps:
 	@docker compose ps

@@ -8,6 +8,16 @@ import (
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 )
 
+// DeleteUser 	godoc
+// @Summary 	Удаление пользователя
+// @Description Удалить сущетсвующего пользователя из системе
+// @Tags 		Users
+// @Param 		id path int true "ID удаляемого пользователя"
+// @Success 	204 "Успешное удаление пользователя"
+// @Failure 	400 {object} core_http_response.ErrorResponse "Bad request"
+// @Failure 	404 {object} core_http_response.ErrorResponse "Not found"
+// @Failure 	500 {object} core_http_response.ErrorResponse "Internal server error"
+// @Router 		/users/{id} [delete]
 func (h *UsersHTTPHandler) DeleteUser(
 	rw http.ResponseWriter,
 	r *http.Request,

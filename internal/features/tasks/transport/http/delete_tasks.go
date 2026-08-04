@@ -8,6 +8,16 @@ import (
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 )
 
+// DeleteTask 	godoc
+// @Summary 	Удалить задачу
+// @Description Удалить существующую задачу в системе
+// @Tags 		Tasks
+// @Param 		id path int true "ID задачи"
+// @Success 	204 "Успешно удалена задача"
+// @Failure 	404 {object} core_http_response.ErrorResponse "Not found"
+// @Failure 	500 {object} core_http_response.ErrorResponse "Internal sercer error"
+// @Failure 	404 {object} core_http_response.ErrorResponse "Bad request"
+// @Router 		/tasks/{id} [delete]
 func (h *TaskHTTPHandler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
