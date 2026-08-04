@@ -103,16 +103,19 @@ func Panic() Middleware {
 	}
 }
 
-func CORS() Middleware {
+func CORS(allowedOriginsList []string) Middleware {
+	allowedOrg := make(map[string]struct{})
+
+	for _, org := range allowedOriginsList {
+		allowedOrg[org] = struct{}{}
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			allowedOrigins := map[string]struct{}{
-				"http://localhost:5050": {},
-			}
 
 			origin := r.Header.Get("Origin")
 
-			if _, ok := allowedOrigins[origin]; ok {
+			if _, ok := allowedOrg[origin]; ok {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS, PATCH")
 				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
