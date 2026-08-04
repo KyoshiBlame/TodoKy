@@ -207,6 +207,27 @@
         background: var(--accent-gradient);
       }
 
+      .user-edit-btn {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        margin-left: auto;
+        flex-shrink: 0;
+        border-radius: var(--radius-sm);
+        color: var(--text-muted);
+        font-size: 14px;
+        opacity: 0;
+        transition: all var(--transition-fast);
+      }
+      .user-item:hover .user-edit-btn {
+        opacity: 1;
+      }
+      .user-edit-btn:hover {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
       .avatar {
         display: grid;
         place-items: center;
@@ -1100,12 +1121,19 @@
     function renderUsers() {
       const list = $('#users-list');
       list.replaceChildren(...state.users.map(user => {
-        const btn = document.createElement('button');
-        btn.className = `user-item${user.id === state.selectedUserId ? ' active' : ''}`;
-        btn.innerHTML = `<span class="avatar">${initials(user.full_name)}</span><span class="user-name">${escapeHtml(user.full_name)}</span>`;
-        btn.onclick = () => selectUser(user.id);
-        btn.ondblclick = () => openUserDialog(user.id);
-        return btn;
+        const item = document.createElement('div');
+        item.className = `user-item${user.id === state.selectedUserId ? ' active' : ''}`;
+        item.style.cursor = 'pointer';
+        item.innerHTML = `<span class="avatar">${initials(user.full_name)}</span><span class="user-name">${escapeHtml(user.full_name)}</span><button class="user-edit-btn" title="Редактировать пользователя" aria-label="Редактировать ${escapeHtml(user.full_name)}">✎</button>`;
+        item.onclick = (e) => {
+          if (e.target.closest('.user-edit-btn')) return;
+          selectUser(user.id);
+        };
+        item.querySelector('.user-edit-btn').onclick = (e) => {
+          e.stopPropagation();
+          openUserDialog(user.id);
+        };
+        return item;
       }));
     }
 
