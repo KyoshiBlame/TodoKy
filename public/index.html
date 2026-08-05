@@ -876,6 +876,10 @@
           <span class="brand-mark">✓</span>
           <span class="brand-text">TodoKy</span>
         </a>
+        <button class="user-item all-tasks-btn" id="all-tasks-button">
+          <span class="avatar" style="background: var(--accent-gradient); color: #fff;">⋯</span>
+          <span class="user-name">Все задачи</span>
+        </button>
         <div class="sidebar-heading">
           <span>Участники</span>
           <button class="icon-button" id="add-user-button" title="Добавить пользователя" aria-label="Добавить пользователя">+</button>
@@ -1027,12 +1031,14 @@
 
     const TASKS_PER_PAGE = 10;
 
+    const savedUserId = localStorage.getItem('todoky-user-id');
     const state = {
       apiUrl: localStorage.getItem('todoky-api-url') || defaultApiUrl,
       users: [],
       tasks: [],
+      allTasks: [],
       totalTasks: 0,
-      selectedUserId: Number(localStorage.getItem('todoky-user-id')) || null,
+      selectedUserId: savedUserId === 'all' ? 'all' : (Number(savedUserId) || null),
       filter: 'active',
       currentPage: 0,
       isLoading: false,
@@ -1119,6 +1125,10 @@
 
     /* ========== RENDER: USERS ========== */
     function renderUsers() {
+      /* 'All tasks' button state */
+      const allBtn = $('#all-tasks-button');
+      allBtn.classList.toggle('active', state.selectedUserId === 'all');
+
       const list = $('#users-list');
       list.replaceChildren(...state.users.map(user => {
         const item = document.createElement('div');
@@ -1153,14 +1163,20 @@
 
     /* ========== RENDER: TASKS ========== */
     function renderTasks() {
-      const active = state.tasks.filter(t => !t.completed);
-      const completed = state.tasks.filter(t => t.completed);
+      /* Filter tasks by selected user (client-side) */
+      const userTasks = state.selectedUserId === 'all'
+        ? state.allTasks
+        : state.allTasks.filter(t => t.author_user_id === state.selectedUserId);
+      state.tasks = userTasks;
+
+      const active = userTasks.filter(t => !t.completed);
+      const completed = userTasks.filter(t => t.completed);
       $('#active-count').textContent = active.length;
       $('#completed-count').textContent = completed.length;
 
       const shown = state.filter === 'active' ? active
                    : state.filter === 'completed' ? completed
-                   : state.tasks;
+                   : userTasks;
 
       const list = $('#tasks-list');
       list.replaceChildren(...shown.map(task => {
@@ -1198,7 +1214,7 @@
         return item;
       }));
 
-      $('#empty-state').hidden = shown.length !== 0 || !state.selectedUserId;
+      $('#empty-state').hidden = shown.length !== 0 || state.selectedUserId === null;
 
       renderPagination();
     }
@@ -1230,6 +1246,7 @@
 
     async function refreshDashboard() {
       if (!state.selectedUserId) {
+        state.allTasks = [];
         state.tasks = [];
         renderTasks();
         renderStatistics();
@@ -1239,20 +1256,24 @@
       }
 
       clearError();
-      $('#add-task-button').disabled = false;
       $('#tasks-list').replaceChildren();
 
-      const user = state.users.find(u => u.id === state.selectedUserId);
-      $('#page-title').textContent = user ? `Задачи: ${user.full_name}` : 'Мои задачи';
+      const isAll = state.selectedUserId === 'all';
+      $('#add-task-button').disabled = isAll;
+
+      if (isAll) {
+        $('#page-title').textContent = 'Все задачи';
+      } else {
+        const user = state.users.find(u => u.id === state.selectedUserId);
+        $('#page-title').textContent = user ? `Задачи: ${user.full_name}` : 'Мои задачи';
+      }
 
       try {
-        const offset = state.currentPage * TASKS_PER_PAGE;
         const [tasks, statistics] = await Promise.all([
-          api.getTasks(TASKS_PER_PAGE, offset),
+          api.getTasks(200, 0),
           api.getStatistics(),
         ]);
-        state.tasks = tasks || [];
-        state.totalTasks = statistics?.tasks_created ?? state.tasks.length;
+        state.allTasks = tasks || [];
         renderTasks();
         renderStatistics(statistics);
       } catch (error) {
@@ -1264,7 +1285,7 @@
       clearError();
       try {
         state.users = await api.getUsers(100, 0) || [];
-        if (state.selectedUserId && !state.users.some(u => u.id === state.selectedUserId)) {
+        if (state.selectedUserId !== 'all' && state.selectedUserId && !state.users.some(u => u.id === state.selectedUserId)) {
           state.selectedUserId = null;
         }
         if (!state.selectedUserId && state.users[0]) {
@@ -1414,6 +1435,7 @@
     };
 
     /* Sidebar buttons */
+    $('#all-tasks-button').onclick = () => selectUser('all');
     $('#add-user-button').onclick = () => openUserDialog();
     $('#add-task-button').onclick = () => openTaskDialog();
     $('#refresh-button').onclick = refreshDashboard;
