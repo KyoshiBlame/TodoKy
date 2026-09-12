@@ -15,6 +15,7 @@ services:
       POSTGRES_TIMEOUT: ${POSTGRES_TIMEOUT:-10s}
       LOGGER_LEVEL: ${LOGGER_LEVEL:-info}
       LOGGER_FOLDER: /app/out/logs
+      AUTH_GRPC_ADDR: "auth-service:50051"
     volumes:
       - ./out/logs:/app/out/logs
     ports:
@@ -22,6 +23,8 @@ services:
     depends_on:
       todoky-postgres:
         condition: service_healthy
+      auth-service:
+        condition: service_started
     restart: unless-stopped
 
   todoky-postgres:
@@ -73,5 +76,55 @@ services:
     volumes:
       - ${PROJECT_ROOT:-.}:/code
 
+
+auth-db:
+  image: postgres:18.4-bookworm
+  container_name: auth-db
+  environment:
+    POSTGRES_USER: ${AUTH_DB_NAME:-auth}
+    POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-authpass}
+    POSTGRES_DB: ${AUTH_DB_NAME:-auth}
+  volumes"
+    - auth-db-data:/var/lib/postgresql
+  healtcheck:
+    test:
+      - CMD-SHELL
+      - pg_isready -U "$$POSTGRES_USER -d $POSGRES_DB"
+    interval: 5s
+    retries: 10
+  restart: unless-stopped
+
+auth-service:
+    build:
+      context: ../authTodoky
+      dockerfile: cmd/auth/Dockerfile
+    container_name: auth-service
+    environment:
+      GRPC_PORT: "50051"
+      POSTGRES_HOST: auth-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${AUTH_DB_USER:-auth}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-authpass}
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth}
+      POSTGRES_TIMEOUT: ${POSTGRES_TIMEOUT:-10s}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      LOGGER_LEVEL: ${LOGGER_LEVEL:-info}
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    restart: unless-stopped
+    auth-db-migrate:
+    image: migrate/migrate:v4.19.1
+    volumes:
+      - ../auth-service/migrations:/migrations
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://${AUTH_DB_USER:-auth}:${AUTH_DB_PASSWORD:-authpass}@auth-db:5432/${AUTH_DB_NAME:-auth}?sslmode=disable"
+      - "up"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
 volumes:
   todoky-postgres-data:
+  auth-db-data: 
