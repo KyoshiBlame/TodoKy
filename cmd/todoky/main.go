@@ -60,7 +60,7 @@ func main() {
 	logger.Debug("initiazling postgres connection pool")
 	pool, err := core_pgx_pool.NewPool(ctx, core_pgx_pool.NewConfigMust())
 	if err != nil {
-		logger.Fatal("failed to init posgres connection pool", zap.Error(err))
+		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
 	}
 	defer pool.Close()
 

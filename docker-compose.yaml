@@ -6,14 +6,14 @@ services:
     container_name: todoky
     environment:
       HTTP_ADDR: ":5050"
-      HTTP_SHUTDOWN_TIMEOUT: ${HTTP_SHUTDOWN_TIMEOUT:-30s}
+      HTTP_SHUTDOWN_TIMEOUT: ${HTTP_SHUTDOWN_TIMEOUT:?set HTTP_SHUTDOWN_TIMEOUT in .env}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?set ALLOWED_ORIGINS in .env}
       POSTGRES_HOST: todoky-postgres
       POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
       POSTGRES_TIMEOUT: ${POSTGRES_TIMEOUT:-10s}
-      LOGGER_LEVEL: ${LOGGER_LEVEL:-info}
+      LOGGER_LEVEL: ${LOGGER_LEVEL:?set LOGGER_LEVEL in .env}
       LOGGER_FOLDER: /app/out/logs
     volumes:
       - ./out/logs:/app/out/logs
