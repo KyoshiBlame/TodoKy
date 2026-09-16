@@ -76,25 +76,26 @@ services:
     volumes:
       - ${PROJECT_ROOT:-.}:/code
 
+  auth-db:
+    image: postgres:18.4-bookworm
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER:-auth}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-authpass}
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth}
+    volumes:
+      - auth-db-data:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
 
-auth-db:
-  image: postgres:18.4-bookworm
-  container_name: auth-db
-  environment:
-    POSTGRES_USER: ${AUTH_DB_NAME:-auth}
-    POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-authpass}
-    POSTGRES_DB: ${AUTH_DB_NAME:-auth}
-  volumes"
-    - auth-db-data:/var/lib/postgresql
-  healtcheck:
-    test:
-      - CMD-SHELL
-      - pg_isready -U "$$POSTGRES_USER -d $POSGRES_DB"
-    interval: 5s
-    retries: 10
-  restart: unless-stopped
-
-auth-service:
+  auth-service:
     build:
       context: ../authTodoky
       dockerfile: cmd/auth/Dockerfile
@@ -109,14 +110,19 @@ auth-service:
       POSTGRES_TIMEOUT: ${POSTGRES_TIMEOUT:-10s}
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       LOGGER_LEVEL: ${LOGGER_LEVEL:-info}
+      LOGGER_FOLDER: /app/out/logs
+    ports:
+      - "50051:50051"
     depends_on:
       auth-db:
         condition: service_healthy
     restart: unless-stopped
-    auth-db-migrate:
+
+  auth-db-migrate:
     image: migrate/migrate:v4.19.1
     volumes:
-      - ../auth-service/migrations:/migrations
+      - ../authTodoky/migrations:/migrations
+      - ./out/auth-logs:/app/out/logs
     command:
       - "-path=/migrations"
       - "-database=postgres://${AUTH_DB_USER:-auth}:${AUTH_DB_PASSWORD:-authpass}@auth-db:5432/${AUTH_DB_NAME:-auth}?sslmode=disable"
@@ -127,4 +133,4 @@ auth-service:
 
 volumes:
   todoky-postgres-data:
-  auth-db-data: 
+  auth-db-data:
