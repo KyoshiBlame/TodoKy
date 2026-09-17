@@ -59,7 +59,7 @@ func (h *AuthHTTPHandler) Login(rw http.ResponseWriter, r *http.Request) {
 	})
 
 	responseHandler.JSONResponse(
-		LoginResponse{userID: userID},
+		LoginResponse{UserID: userID},
 		http.StatusOK,
 	)
 }

@@ -21,12 +21,12 @@ func (h *AuthHTTPHandler) Routes() []core_http_server.Route {
 	return []core_http_server.Route{
 		{
 			Method:  http.MethodPost,
-			Path:    "auth/register",
+			Path:    "/auth/register",
 			Handler: h.Register,
 		},
 		{
 			Method:  http.MethodPost,
-			Path:    "auth/Login",
+			Path:    "/auth/login",
 			Handler: h.Login,
 		},
 	}
