@@ -7,7 +7,7 @@ import (
 	pb "github.com/KyoshiBlame/TodoKy/proto"
 )
 
-func (c *AuthClient) Validate(
+func (c *AuthClient) ValidateToken(
 	ctx context.Context,
 	token string,
 ) (int64, error) {

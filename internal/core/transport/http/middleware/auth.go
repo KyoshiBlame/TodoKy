@@ -25,6 +25,7 @@ func Auth(validator TokenValidater) Middleware {
 			userID, err := validator.ValidateToken(r.Context(), cookie.Value)
 			if err != nil {
 				http.Redirect(w, r, "/auth.html", http.StatusTemporaryRedirect)
+				return
 			}
 
 			ctx := context.WithValue(r.Context(), UserIdKey, userID)

@@ -14,7 +14,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	userID int64 `json:"user_id"`
+	UserID int64 `json:"user_id"`
 }
 
 func (h *AuthHTTPHandler) Login(rw http.ResponseWriter, r *http.Request) {
@@ -45,6 +45,7 @@ func (h *AuthHTTPHandler) Login(rw http.ResponseWriter, r *http.Request) {
 			err,
 			"failed to login",
 		)
+		return
 	}
 
 	http.SetCookie(rw, &http.Cookie{
