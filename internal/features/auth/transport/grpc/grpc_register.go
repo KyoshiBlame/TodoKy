@@ -7,7 +7,7 @@ import (
 	pb "github.com/KyoshiBlame/TodoKy/proto"
 )
 
-func (c *authClient) Register(
+func (c *AuthClient) Register(
 	ctx context.Context,
 	email, password, fullName string,
 ) (int64, error) {

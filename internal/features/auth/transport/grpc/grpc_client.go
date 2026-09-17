@@ -8,12 +8,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type authClient struct {
+type AuthClient struct {
 	client pb.AuthServiceClient
 	conn   *grpc.ClientConn
 }
 
-func NewAuthClient(authSeviceAddr string) (*authClient, error) {
+func NewAuthClient(authSeviceAddr string) (*AuthClient, error) {
 	conn, err := grpc.NewClient(
 		authSeviceAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -24,9 +24,9 @@ func NewAuthClient(authSeviceAddr string) (*authClient, error) {
 	}
 
 	client := pb.NewAuthServiceClient(conn)
-	return &authClient{client: client, conn: conn}, nil
+	return &AuthClient{client: client, conn: conn}, nil
 }
 
-func (c *authClient) Close() error {
+func (c *AuthClient) Close() error {
 	return c.conn.Close()
 }
