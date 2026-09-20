@@ -120,18 +120,24 @@ func main() {
 	// apiVersionRouterV1.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 	// httpServer.RegisterAPIRouters(apiVersionRouterV1)
 
-	publicRouterV1 := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
-	publicRouterV1.RegisterRoutes(authTransportHTTP.Routes()...)
-
-	// Защищённый роутер — С auth middleware (нужен JWT cookie)
-	protectedRouterV1 := core_http_server.NewAPIVersionRouter(
-		core_http_server.ApiVersion1,
-		core_http_middleware.Auth(authClient),
-	)
-	protectedRouterV1.RegisterRoutes(usersTransportHTTP.Routes()...)
-	protectedRouterV1.RegisterRoutes(tasksTransportHTTP.Routes()...)
-	protectedRouterV1.RegisterRoutes(statisticsTransportHTTP.Routes()...)
-	httpServer.RegisterAPIRouters(publicRouterV1, protectedRouterV1)
+	authMW := core_http_middleware.Auth(authClient)
+	apiVersionRouterV1 := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
+	// Публичные — без auth
+	apiVersionRouterV1.RegisterRoutes(authTransportHTTP.Routes()...)
+	// Защищённые — с auth middleware на каждом роуте
+	for _, route := range usersTransportHTTP.Routes() {
+		route.Middleware = append(route.Middleware, authMW)
+		apiVersionRouterV1.RegisterRoutes(route)
+	}
+	for _, route := range tasksTransportHTTP.Routes() {
+		route.Middleware = append(route.Middleware, authMW)
+		apiVersionRouterV1.RegisterRoutes(route)
+	}
+	for _, route := range statisticsTransportHTTP.Routes() {
+		route.Middleware = append(route.Middleware, authMW)
+		apiVersionRouterV1.RegisterRoutes(route)
+	}
+	httpServer.RegisterAPIRouters(apiVersionRouterV1)
 
 	httpServer.RegisterSwagger()
 	httpServer.RegisterRoutes(webTransportHTTP.Routes()...)
