@@ -10,6 +10,7 @@ type WebHTTPHandler struct {
 
 type WebService interface {
 	GetMainPage() ([]byte, error)
+	GetAuthPage() ([]byte, error)
 }
 
 func NewWebHTTPHandler(
@@ -25,6 +26,10 @@ func (h *WebHTTPHandler) Routes() []core_http_server.Route {
 		{
 			Path:    "/",
 			Handler: h.GetMainPage,
+		},
+		{
+			Path:    "/auth.html",
+			Handler: h.GetAuthPage,
 		},
 	}
 }
