@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
+	core_errors "github.com/KyoshiBlame/TodoKy/internal/core/errors"
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
+	core_http_middleware "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/middleware"
 	core_http_request "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/request"
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 	core_http_types "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/types"
@@ -80,6 +82,20 @@ func (h *TaskHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 		responseHandler.ErrorResponse(
 			err,
 			"failed to get 'id' from path",
+		)
+		return
+	}
+
+	userID, _ := core_http_middleware.UserIDFromContext(ctx)
+	task, err := h.tasksService.GetTask(ctx, taskID)
+	if err != nil {
+		responseHandler.ErrorResponse(err, "failed to get task")
+		return
+	}
+	if task.AuthorUserID != int(userID) {
+		responseHandler.ErrorResponse(
+			core_errors.ErrForbidden,
+			"you can only edit your own tasks",
 		)
 		return
 	}

@@ -4,15 +4,16 @@ import (
 	"net/http"
 
 	"github.com/KyoshiBlame/TodoKy/internal/core/domain"
+	core_errors "github.com/KyoshiBlame/TodoKy/internal/core/errors"
 	core_logger "github.com/KyoshiBlame/TodoKy/internal/core/logger"
+	core_http_middleware "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/middleware"
 	core_http_request "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/request"
 	core_http_response "github.com/KyoshiBlame/TodoKy/internal/core/transport/http/response"
 )
 
 type CreateTaskRequest struct {
-	Title        string  `json:"title" validate:"required,min=1,max=100" example:"Сходить в магазин"`
-	Description  *string `json:"description" validate:"omitempty,min=1,max=1000" example:"Купить рис, курицу и молока"`
-	AuthorUserID int     `json:"author_user_id" validate:"required" example:"1"`
+	Title       string  `json:"title" validate:"required,min=1,max=100" example:"Сходить в магазин"`
+	Description *string `json:"description" validate:"omitempty,min=1,max=1000" example:"Купить рис, курицу и молока"`
 }
 
 type CreateTaskResponse TaskDTOResponse
@@ -43,10 +44,19 @@ func (h *TaskHTTPHandler) CreateTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userID, ok := core_http_middleware.UserIDFromContext(ctx)
+	if !ok {
+		responseHandler.ErrorResponse(
+			core_errors.ErrUnauthorized,
+			"user not authenticated",
+		)
+		return
+	}
+
 	taskDomain := domain.NewTaskUninitialized(
 		request.Title,
 		request.Description,
-		request.AuthorUserID,
+		int(userID),
 	)
 
 	taskDomain, err := h.tasksService.CreateTask(ctx, taskDomain)
